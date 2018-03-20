@@ -3,16 +3,18 @@ import pathlib
 import csv
 
 #count_answer = 0   # подсчёт количества списков ответов (должно совпадать с количеством нужных файлов из папки)
+inputPath = 'E:/Wavelet_analysis/Analyzer_export/'
+outputPath = 'D:/Lisa/THESIS/DLproject/data.csv'
 
 # вписывание данных в отдельный файл (таблицей)
-with open('/Users/roman/untitled/data_task/data.csv', 'w', newline="") as my_file:
+with open(outputPath, 'w', newline="") as my_file:
     columns = ["person", "day", "type task", "answers old", "count task", "answers new", 
                "correct", "uncorrect", "bad intervals", "bad 1", "bad 0", "sum bad"]
     writer = csv.DictWriter(my_file, fieldnames=columns)
     writer.writeheader()
 # путь к папке, откуда будем брать файлы '/Users/roman/untitled/data_task'
 # просим список файлов в папке и фильтруем его по расширению ()
-    for vmrk_files in pathlib.Path('/Users/roman/untitled/data_task/Segmented').glob('*vmrk'):
+    for vmrk_files in pathlib.Path(inputPath).glob('*wMarkers.vmrk'):
 
 # теперь раобтаем с каждым файлом по порядку
         f = open(vmrk_files, 'r')  # открываем файл для чтения
