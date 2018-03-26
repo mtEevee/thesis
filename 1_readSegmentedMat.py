@@ -10,6 +10,7 @@ nSegments = data.shape[1]
 for i in range(0,nSegments):
     segments = data[:,i]
 
+
 #print(data.head)
 #data = f.get('data/variable1')
 #data = np.array(data)

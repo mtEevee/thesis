@@ -1,3 +1,4 @@
+
 import mne
 
 from mne.datasets import sample  # noqa
@@ -17,3 +18,13 @@ print(data.shape)
 print(times.shape)
 data, times = raw[2:20:3, start:stop]  # access underlying data
 raw.plot()
+
+
+
+
+
+
+
+
+
+
