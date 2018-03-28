@@ -2,33 +2,31 @@
 import pathlib
 import csv
 
-#count_answer = 0   # подсчёт количества списков ответов (должно совпадать с количеством нужных файлов из папки)
-inputPath = 'E:/Wavelet_analysis/Analyzer_export/'
-outputPath = 'D:/Lisa/THESIS/DLproject/data.csv'
+inputPath =  "/Users/roman/untitled/data_task/Segmented"
+#inputPath = 'E:/Wavelet_analysis/Analyzer_export/'
+outputPath = "/Users/roman/PycharmProjects/thesis/data.csv"
+#outputPath = 'D:/Lisa/THESIS/DLproject/data.csv'
 
 # вписывание данных в отдельный файл (таблицей)
 with open(outputPath, 'w', newline="") as my_file:
     columns = ["person", "day", "type task", "answers old", "count task", "answers new", 
-               "correct", "uncorrect", "bad intervals", "bad 1", "bad 0", "sum bad"]
+               "correct", "uncorrect", "bad intervals", "count bad"]
     writer = csv.DictWriter(my_file, fieldnames=columns)
     writer.writeheader()
-# путь к папке, откуда будем брать файлы '/Users/roman/untitled/data_task'
+
 # просим список файлов в папке и фильтруем его по расширению ()
     for vmrk_files in pathlib.Path(inputPath).glob('*wMarkers.vmrk'):
 
 # теперь раобтаем с каждым файлом по порядку
         f = open(vmrk_files, 'r')  # открываем файл для чтения
 
-#n_row = sum(1 for l in open(vmrk_files, 'r')) # считаем количество строк в файле
-#print(n_row)
-
         C = [] # будущий список ответов
         A = [] # бинарный список ответов
-        #B = [] # бинарный список багов?
-        #bad1 = 0
-        #bad0 = 0
-        #time = 1
-        #r = 0
+        B = [] # бинарный список багов
+        time = -1999 #время сегментов
+        time_bad = 1 #время багов
+        pr_time_bad = time_bad
+        count_bad = 0 #считает B.I. в файле
         segments = 0 # счётчик количества заданий (New Segment)
         seg_new = 0 # переменная для обозначения начала (1) / конца (0) сегмента
         correct = 0 # счётчик правильных ответов
@@ -64,50 +62,88 @@ with open(outputPath, 'w', newline="") as my_file:
                     elif dl==40 or dl==46:   # двузначный день (10 - 99)
                         person = a[index_p-2:index_p]
                     elif dl==47: # выброс
-                        person = a[index_p-2:index_p]  
-                
-           # bad_seg = a.find("Bad Interval") # баг?
-            #if bad_seg!=-1: # если да, то ...
-             #   bad1+=1 # +1 к багам
-              #  count_bad+=1 # помощник в упоминании багов
+                        person = a[index_p-2:index_p]
                 
             new_seg = a.find("New Segment") # начало нового сегмента?
             if new_seg!=-1:  # если да, то...
                 segments+=1 # счётчик количества сегментов, то есть заданий (в конкретном файле)
                 seg_new = 1 # начался сегмент
-             #   if segments>1 and count_bad==0: # если сегментов больше одного, а багов не было, то..
-              #      B.append('0')  # указать 0
-               #     bad0+=1        # +1 к отсутсвию багов
-                #elif count_bad!=0 and segments>1:
-                 #   B.append('1')  # указать 1
-                  #  count_bad-=1   # вычесть у помощника упоминание бага
+                if segments==2 and len(B)==0:
+                    B.append(False)
+                time+=2000
 
-        #    if a.find("Marker User Infos")!=-1 and count_bad==1:
-         #       B.append('1')
-          #      bad1+=1
-           #     count_bad-=1
-            #elif a.find("Marker User Infos")!=-1 and count_bad==0:
-             #   B.append('0')
-              #  bad0+=1
-               # count_bad-=1
-            
+            bad_seg = a.find("Bad Interval") # баг?
+            if bad_seg!=-1: # если да, то...
+                index_time_bad = a.find(",,") # ищем индекс запятых перед временем
+                count_bad+=1
+                pr_time_bad = int(time_bad)
+
+                if time==-1999:
+                    time_bad = 1
+                elif time==1 or time+2000==2001:
+                    time1 = a[index_time_bad + 2]
+                    time2 = a[index_time_bad + 2:index_time_bad + 6]
+                    if time2 == '2001':
+                        time_bad = time2
+                    elif time1 == '1':
+                        time_bad = time1
+                elif time<8001 and time+2000<=8001:
+                    time_bad = a[index_time_bad+2:index_time_bad+6] # 4 цифры
+                elif time==8001 and time+2000==10001:  # граница 8001 или 10001
+                    time1 = a[index_time_bad+2:index_time_bad+6] # 4 цифры
+                    time2 = a[index_time_bad+2:index_time_bad+7] # 5 цифр
+                    if time1=='8001':
+                        time_bad = time1
+                    elif time2=='10001':
+                        time_bad = time2
+                elif time<98001 and time+2000<=98001:
+                    time_bad = a[index_time_bad+2:index_time_bad+7] # 5 цифр
+                elif time==98001 or time+2000==100001:
+                    time1 = a[index_time_bad+2:index_time_bad+7] # 5 цифры
+                    time2 = a[index_time_bad+2:index_time_bad+8] # 6 цифр
+                    if time1=='98001':
+                        time_bad = time1
+                    elif time2=='100001':
+                            time_bad = time2
+                elif time<=980001:
+                    time_bad = a[index_time_bad+2:index_time_bad+8] # 6 цифр
+
+            if ((segments==1 and time_bad=='2001') or segments==2) and len(B)==0:
+                B.append(False)
+
+            if int(time_bad)==time:
+                r = (time-pr_time_bad)//2000-1
+            elif int(time_bad)==time+2000:
+                r = (time-pr_time_bad)//2000
+            while r>0:
+                B.append(False)
+                r-=1
+            B.append(True)
+
             b = a.rfind("Stimulus,S ")  # стимул?
             if b!=-1:  # если да , то...
                 b=b+14 # индекс цифры, кодирующий (не)ответ 
                 if seg_new==1: # если это первый стимул после начала сегмента, то...
-                    C.append(a[b]) # добавить в список вычлененную циферку
+                    d = int(a[b])
+                    C.append(d) # добавить в список вычлененную циферку
                     seg_new = 0 # не считывать дальше в сегменте Stimulus
                     if a[b]=='1':
-                        A.append('1')
+                        A.append(1)
                         correct+=1
                     elif a[b]!='1':
-                        A.append('0')
+                        A.append(0)
                         uncorrect+=1
-        
+
+            final = a.find("Marker User Infos") # конец документа?
+            if final!=-1:
+                r = (time-int(time_bad))//2000
+                while r>0:
+                    B.append(False)
+                    r-=1
+
         row = {"person" : person, "day" : day, "type task" : type_f, "answers old" : C[0:len(C)], 
                "count task" : segments, "answers new" : A[0:len(A)], "correct" : correct, 
-               "uncorrect" : uncorrect, #"bad intervals" : B[0:len(B)], "bad 1": bad1, 
-              # "bad 0" : bad0, "?" : len(B) 
+               "uncorrect" : uncorrect, "bad intervals" : B[0:len(B)], "count bad" : count_bad
               }
         writer.writerow(row)
 
@@ -121,3 +157,9 @@ with open(outputPath, 'w', newline="") as my_file:
 #A[] # бинарный список ответов (1 - correct / 0 - not or no)
 #correct # правильные ответы
 #uncorrect # неправильные ответы или отсутствие ответа
+#B[] # bad intervals
+#count_bad # количество багов
+
+import pandas as pd
+table = pd.read_csv('data.csv')
+print(table.head(10))
