@@ -27,7 +27,7 @@ print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 print(model.summary())
 
 #plot model
-#plot_model(model, to_file='D:/Lisa/THESIS/tryKeras.png', show_shapes=True, show_layer_names=True)
+plot_model(model, to_file='D:/Lisa/THESIS/tryKeras.png', show_shapes=True, show_layer_names=True)
 
 
 
