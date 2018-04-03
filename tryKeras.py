@@ -15,7 +15,8 @@ with graph.as_default():
 with tf.Session(graph=graph) as sess:
   sess.run(initialize)
   sess.run(assign)
-file_writer = tf.summary.FileWriter('D:/Lisa/forPython/logs', sess.graph)
+logDir = 'D:/Lisa/forPython/logs'
+file_writer = tf.summary.FileWriter(logDir, sess.graph)
 
 
 # load pima indians dataset
@@ -32,8 +33,8 @@ model.add(Dense(1, activation='sigmoid'))
 
 #Compile and fit the model
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-model.fit(X, Y, epochs=150, batch_size=10)
-#model.fit(X, Y, batch_size=10,epochs=150,verbose=1, callbacks=[keras.callbacks.TensorBoard(log_dir="logs/final/{}".format(time()), histogram_freq=1, write_graph=True, write_images=True)])
+#model.fit(X, Y, epochs=150, batch_size=10)
+model.fit(X, Y, batch_size=10,epochs=150,verbose=1, callbacks=[keras.callbacks.TensorBoard(log_dir=logDir, write_graph=True, write_images=True)])
 
 # evaluate the model
 scores = model.evaluate(X, Y)
@@ -42,7 +43,7 @@ print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 print(model.summary())
 
 #plot model
-plot_model(model, to_file='D:/Lisa/THESIS/tryKeras.png', show_shapes=True, show_layer_names=True)
+#plot_model(model, to_file='D:/Lisa/THESIS/tryKeras.png', show_shapes=True, show_layer_names=True)
 
 
 
