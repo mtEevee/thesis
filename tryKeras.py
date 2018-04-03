@@ -1,18 +1,25 @@
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.utils.vis_utils import plot_model
-import numpy
-import tensorboard
 import tensorflow as tf
+import tensorboard
 import keras
-
-
-file_writer = tf.summary.FileWriter('/Users/roman/untitled/logs', tf.Session.Graf)
-
+import numpy
 numpy.random.seed(7) #initialized the random number generator to ensure our results are reproducible
 
+graph = tf.Graph()
+with graph.as_default():
+  variable = tf.Variable(42, name='foo')
+  initialize = tf.global_variables_initializer()
+  assign = variable.assign(13)
+with tf.Session(graph=graph) as sess:
+  sess.run(initialize)
+  sess.run(assign)
+file_writer = tf.summary.FileWriter('D:/Lisa/forPython/logs', sess.graph)
+
+
 # load pima indians dataset
-dataset = numpy.loadtxt("/Users/roman/Downloads/pima-indians-diabetes.csv", delimiter=",")
+dataset = numpy.loadtxt("D:/Lisa/THESIS/pima-indians-diabetes.csv", delimiter=",")
 # split into input (X) and output (Y) variables
 X = dataset[:,0:8] #X - input data, all rows and first 7 columns
 Y = dataset[:,8] # Y - output data, all rows and last column, only 0 or 1 values
@@ -26,9 +33,7 @@ model.add(Dense(1, activation='sigmoid'))
 #Compile and fit the model
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.fit(X, Y, epochs=150, batch_size=10)
-model.fit(X, Y, batch_size=10, epochs=150, verbose=1,
-          callbacks=[keras.callbacks.TensorBoard(log_dir="logs/final/{}".format(time()),
-                                                 histogram_freq=1, write_graph=True, write_images=True)])
+#model.fit(X, Y, batch_size=10,epochs=150,verbose=1, callbacks=[keras.callbacks.TensorBoard(log_dir="logs/final/{}".format(time()), histogram_freq=1, write_graph=True, write_images=True)])
 
 # evaluate the model
 scores = model.evaluate(X, Y)
@@ -37,7 +42,7 @@ print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 print(model.summary())
 
 #plot model
-#plot_model(model, to_file='D:/Lisa/THESIS/tryKeras.png', show_shapes=True, show_layer_names=True)
+plot_model(model, to_file='D:/Lisa/THESIS/tryKeras.png', show_shapes=True, show_layer_names=True)
 
 
 
