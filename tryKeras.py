@@ -2,10 +2,17 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.utils.vis_utils import plot_model
 import numpy
+import tensorboard
+import tensorflow as tf
+import keras
+
+
+file_writer = tf.summary.FileWriter('/Users/roman/untitled/logs', tf.Session.Graf)
+
 numpy.random.seed(7) #initialized the random number generator to ensure our results are reproducible
 
 # load pima indians dataset
-dataset = numpy.loadtxt("D:/Lisa/THESIS/pima-indians-diabetes.csv", delimiter=",")
+dataset = numpy.loadtxt("/Users/roman/Downloads/pima-indians-diabetes.csv", delimiter=",")
 # split into input (X) and output (Y) variables
 X = dataset[:,0:8] #X - input data, all rows and first 7 columns
 Y = dataset[:,8] # Y - output data, all rows and last column, only 0 or 1 values
@@ -19,6 +26,9 @@ model.add(Dense(1, activation='sigmoid'))
 #Compile and fit the model
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.fit(X, Y, epochs=150, batch_size=10)
+model.fit(X, Y, batch_size=10, epochs=150, verbose=1,
+          callbacks=[keras.callbacks.TensorBoard(log_dir="logs/final/{}".format(time()),
+                                                 histogram_freq=1, write_graph=True, write_images=True)])
 
 # evaluate the model
 scores = model.evaluate(X, Y)

@@ -46,7 +46,7 @@ with open(outputPath, 'w', newline="") as my_file:
                     type_f = a[index_type:index_type+4] # тип задания
                     day = a[index_type-4] #  день (1-ый или 5-ый)
             # нахождение номера респондента
-                    if dl==38 or dl==43:  # однозначный номер (1 - 9)
+                    if dl==38 or dl==44:  # однозначный номер (1 - 9)
                         person = a[index_p-1]
                     elif dl==39 or dl==45:   # двузначный номер (10 - 99)
                         person = a[index_p-2:index_p]
@@ -162,4 +162,4 @@ with open(outputPath, 'w', newline="") as my_file:
 
 import pandas as pd
 table = pd.read_csv('data.csv')
-print(table.head(10))
+print(table.head(116))
